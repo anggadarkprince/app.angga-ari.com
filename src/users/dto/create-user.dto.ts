@@ -1,6 +1,6 @@
 import {IsEmail, IsString, Length, MaxLength, MinLength, Validate} from "class-validator";
-import {EmailAvailableRule} from "../rules/email-exists.rule";
-import {UsernameExists} from "../rules/username-exists.rule";
+import {EmailAvailableRule} from "../rules/email-available.rule";
+import {UsernameAvailable} from "../rules/username-available.rule";
 
 export class CreateUserDto {
     @IsString()
@@ -10,7 +10,7 @@ export class CreateUserDto {
     @IsString()
     @MinLength(3)
     @MaxLength(20)
-    @UsernameExists(null, {
+    @UsernameAvailable(null, {
         message: 'User $value already exists. Choose another username.',
     })
     username: string;

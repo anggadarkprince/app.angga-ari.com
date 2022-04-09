@@ -12,6 +12,7 @@ import cookieConfig from "./config/cookie.config";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {UsersModule} from './users/users.module';
 import {APP_PIPE} from "@nestjs/core";
+import {join} from 'path';
 
 const environment = (process.env.NODE_ENV || 'production');
 
@@ -43,9 +44,13 @@ const environment = (process.env.NODE_ENV || 'production');
                 password: configService.get<string>('database.default.password'),
                 port: +configService.get<number>('database.default.port'),
                 database: configService.get<string>('database.default.db'),
+                migrationsTableName: 'migrations',
+                //migrations: ["src/**/*/migrations/*{.ts,.js}"],
+                migrations: ["dist/**/*/migrations/*{.ts,.js}"],
+                migrationsRun: false,
+                synchronize: false,
                 autoLoadEntities: true,
                 logging: environment != 'production',
-                synchronize: false,
             }),
         }),
         UsersModule,
