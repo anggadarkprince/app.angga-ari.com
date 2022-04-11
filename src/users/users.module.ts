@@ -13,7 +13,8 @@ import {UsernameAvailableRule} from "./rules/username-available.rule";
         UsersService,
         EmailAvailableRule,
         UsernameAvailableRule
-    ]
+    ],
+    exports: [UsersService]
 })
 export class UsersModule {
 }
