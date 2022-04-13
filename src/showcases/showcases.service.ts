@@ -21,7 +21,7 @@ export class ShowcasesService {
         const showcase = this.repo.create(createShowcaseDto);
         showcase.user = user;
 
-        return this.repo.save(user);
+        return this.repo.save(showcase);
     }
 
     /**
@@ -67,6 +67,6 @@ export class ShowcasesService {
             throw new NotFoundException('Showcase not found');
         }
 
-        return this.repo.remove(showcase);
+        return this.repo.softRemove(showcase);
     }
 }
