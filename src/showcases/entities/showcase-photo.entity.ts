@@ -23,10 +23,7 @@ export class ShowcasePhoto {
     photo_title: string;
 
     @Column()
-    path: string;
-
-    @Column()
-    url: string;
+    src: string;
 
     @Column({type: "int", default: 1})
     order: number;

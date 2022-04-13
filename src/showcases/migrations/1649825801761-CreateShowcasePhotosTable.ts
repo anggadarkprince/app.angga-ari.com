@@ -9,8 +9,7 @@ export class CreateShowcasePhotosTable1649825801761 implements MigrationInterfac
                 {name: 'id', type: 'int', unsigned: true, isPrimary: true, isGenerated: true, generationStrategy: "increment"},
                 {name: 'showcase_id', type: 'int', unsigned: true},
                 {name: 'photo_title', type: 'varchar', length: '100'},
-                {name: 'path', type: 'varchar', length: '200', isNullable: true},
-                {name: 'url', type: 'varchar', length: '250', isNullable: true},
+                {name: 'src', type: 'varchar', length: '250', isNullable: true},
                 {name: 'order', type: 'int', default: 1},
                 {name: 'created_at', type: 'timestamp', default: 'now()'},
             ]

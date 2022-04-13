@@ -1,14 +1,19 @@
 import {Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from "@nestjs/typeorm";
 import {Showcase} from "./entities/showcase.entity";
-import {Repository} from "typeorm";
+import {Connection, Repository} from "typeorm";
 import {CreateShowcaseDto} from "./dto/create-showcase.dto";
 import {User} from "../users/entities/user.entity";
 import {UpdateShowcaseDto} from "./dto/update-showcase.dto";
+import {ShowcasePhoto} from "./entities/showcase-photo.entity";
 
 @Injectable()
 export class ShowcasesService {
-    constructor(@InjectRepository(Showcase) private repo: Repository<Showcase>) {
+    constructor(
+        @InjectRepository(Showcase) private showcaseRepository: Repository<Showcase>,
+        @InjectRepository(ShowcasePhoto) private showcasePhotoRepository: Repository<ShowcasePhoto>,
+        private connection: Connection
+    ) {
     }
 
     /**
@@ -18,17 +23,26 @@ export class ShowcasesService {
      * @param user
      */
     async create(createShowcaseDto: CreateShowcaseDto, user: User) {
-        const showcase = this.repo.create(createShowcaseDto);
-        showcase.user = user;
+        return await this.connection.transaction(async manager => {
+            let showcase = this.showcaseRepository.create(createShowcaseDto);
+            showcase.user = user;
+            showcase = await manager.save(showcase);
 
-        return this.repo.save(showcase);
+            for (const photo of createShowcaseDto.photos) {
+                let showcasePhoto = this.showcasePhotoRepository.create(photo);
+                showcasePhoto.showcase = showcase;
+                await manager.save(showcasePhoto);
+            }
+
+            return showcase;
+        });
     }
 
     /**
      * Find all showcase data.
      */
     findAll() {
-        return this.repo.find();
+        return this.showcaseRepository.find();
     }
 
     /**
@@ -37,7 +51,7 @@ export class ShowcasesService {
      * @param id
      */
     findOne(id: number) {
-        return this.repo.findOne(id);
+        return this.showcaseRepository.findOne(id);
     }
 
     /**
@@ -47,13 +61,26 @@ export class ShowcasesService {
      * @param updateShowcaseDto
      */
     async update(id: number, updateShowcaseDto: UpdateShowcaseDto) {
-        const showcase = await this.findOne(id);
-        if (!showcase) {
+        const oldShowcase = await this.findOne(id);
+        if (!oldShowcase) {
             throw new NotFoundException('Showcase not found');
         }
-        Object.assign(showcase, updateShowcaseDto);
 
-        return this.repo.save(showcase);
+        let {photos, ...showcaseData} = updateShowcaseDto;
+        Object.assign(oldShowcase, showcaseData);
+
+        return await this.connection.transaction(async manager => {
+            let showcase = await manager.save(oldShowcase);
+
+            await manager.delete(ShowcasePhoto, {showcase: showcase})
+            for (const photo of photos) {
+                let showcasePhoto = this.showcasePhotoRepository.create(photo);
+                showcasePhoto.showcase = showcase;
+                await manager.save(showcasePhoto);
+            }
+
+            return showcase;
+        });
     }
 
     /**
@@ -67,6 +94,6 @@ export class ShowcasesService {
             throw new NotFoundException('Showcase not found');
         }
 
-        return this.repo.softRemove(showcase);
+        return this.showcaseRepository.softRemove(showcase);
     }
 }

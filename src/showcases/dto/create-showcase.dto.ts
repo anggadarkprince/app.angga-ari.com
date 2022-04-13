@@ -1,4 +1,16 @@
-import {IsNumber, IsOptional, IsString, IsUrl, MaxLength, Min} from "class-validator";
+import {
+    ArrayNotEmpty,
+    IsArray,
+    IsNumber,
+    IsOptional,
+    IsString,
+    IsUrl,
+    MaxLength,
+    Min,
+    ValidateNested
+} from "class-validator";
+import {CreateShowcasePhotoDto} from "./create-showcase-photo.dto";
+import {Type} from "class-transformer";
 
 export class CreateShowcaseDto {
     @IsString()
@@ -25,4 +37,10 @@ export class CreateShowcaseDto {
     @IsString()
     @MaxLength(200)
     image: string
+
+    @IsArray()
+    @ArrayNotEmpty()
+    @ValidateNested({ each: true })
+    @Type(() => CreateShowcasePhotoDto)
+    photos: CreateShowcasePhotoDto[]
 }
