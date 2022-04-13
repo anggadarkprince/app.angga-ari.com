@@ -13,6 +13,7 @@ import {TypeOrmModule} from "@nestjs/typeorm";
 import {UsersModule} from './users/users.module';
 import {APP_PIPE} from "@nestjs/core";
 import { AuthModule } from './auth/auth.module';
+import { ShowcasesModule } from './showcases/showcases.module';
 const cookieSession = require('cookie-session');
 const environment = (process.env.NODE_ENV || 'production');
 
@@ -55,6 +56,7 @@ const environment = (process.env.NODE_ENV || 'production');
         }),
         UsersModule,
         AuthModule,
+        ShowcasesModule,
     ],
     controllers: [AppController, HealthController],
     providers: [
