@@ -1,7 +1,7 @@
 import {MigrationInterface, QueryRunner, TableColumn} from "typeorm";
 
-export class AlterUserTableAddLastLoggedIn1649482179639 implements MigrationInterface {
-    name = 'AlterUserTableAddLastLoggedIn1649482179639'
+export class AlterUsersTableAddLastLoggedIn1649482179639 implements MigrationInterface {
+    name = 'AlterUsersTableAddLastLoggedIn1649482179639'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.addColumn('users', new TableColumn({

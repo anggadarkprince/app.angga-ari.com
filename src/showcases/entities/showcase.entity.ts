@@ -40,10 +40,10 @@ export class Showcase {
     @Column({type: "text", nullable: true})
     description: string;
 
-    @CreateDateColumn({name: 'created_at'})
+    @CreateDateColumn({name: 'created_at', default: () => 'CURRENT_TIMESTAMP'})
     created_at: Date;
 
-    @UpdateDateColumn({name: 'updated_at'})
+    @UpdateDateColumn({name: 'updated_at', onUpdate: 'CURRENT_TIMESTAMP'})
     updated_at: Date;
 
     @DeleteDateColumn({name: 'deleted_at'})
