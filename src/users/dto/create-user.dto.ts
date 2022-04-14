@@ -1,4 +1,4 @@
-import {IsEmail, IsString, Length, MaxLength, MinLength, Validate} from "class-validator";
+import {IsBoolean, IsEmail, IsString, Length, MaxLength, MinLength, Validate} from "class-validator";
 import {EmailAvailableRule} from "../rules/email-available.rule";
 import {UsernameAvailable} from "../rules/username-available.rule";
 
@@ -21,4 +21,7 @@ export class CreateUserDto {
 
     @IsString()
     password: string;
+
+    @IsBoolean()
+    isActive: boolean = true;
 }

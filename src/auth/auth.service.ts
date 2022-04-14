@@ -3,7 +3,8 @@ import {UsersService} from "../users/users.service";
 import {isEmail} from "class-validator";
 import {User} from "../users/entities/user.entity";
 import {promisify} from "util";
-import {scrypt as _scrypt} from "crypto";
+import {randomBytes, scrypt as _scrypt} from "crypto";
+import {RegisterUserDto} from "./dto/register-user.dto";
 
 const scrypt = promisify(_scrypt);
 
@@ -30,5 +31,9 @@ export class AuthService {
             return user;
         }
         throw new UnauthorizedException('Password is wrong');
+    }
+
+    async register(registerUser: RegisterUserDto) {
+        return this.userService.create(registerUser);
     }
 }

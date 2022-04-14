@@ -11,11 +11,7 @@ import {AuthGuard} from "../guards/auth.guard";
     imports: [TypeOrmModule.forFeature([Showcase, ShowcasePhoto])],
     controllers: [ShowcasesController],
     providers: [
-        ShowcasesService,
-        {
-            provide: APP_GUARD,
-            useClass: AuthGuard,
-        }
+        ShowcasesService
     ]
 })
 export class ShowcasesModule {
