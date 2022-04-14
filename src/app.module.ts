@@ -9,11 +9,16 @@ import {ConfigModule, ConfigService} from "@nestjs/config";
 import appConfig from "./config/app.config";
 import databaseConfig from "./config/database.config";
 import cookieConfig from "./config/cookie.config";
+import emailConfig from "./config/email.config";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {UsersModule} from './users/users.module';
 import {APP_PIPE} from "@nestjs/core";
-import { AuthModule } from './auth/auth.module';
-import { ShowcasesModule } from './showcases/showcases.module';
+import {AuthModule} from './auth/auth.module';
+import {ShowcasesModule} from './showcases/showcases.module';
+import {EventEmitterModule} from "@nestjs/event-emitter";
+import {MailModule} from './mail/mail.module';
+import { UtilityModule } from './utility/utility.module';
+
 const cookieSession = require('cookie-session');
 const environment = (process.env.NODE_ENV || 'production');
 
@@ -34,6 +39,7 @@ const environment = (process.env.NODE_ENV || 'production');
                 appConfig,
                 databaseConfig,
                 cookieConfig,
+                emailConfig,
             ],
         }),
         TypeOrmModule.forRootAsync({
@@ -54,9 +60,12 @@ const environment = (process.env.NODE_ENV || 'production');
                 logging: environment != 'production',
             }),
         }),
+        EventEmitterModule.forRoot(),
         UsersModule,
         AuthModule,
         ShowcasesModule,
+        MailModule,
+        UtilityModule,
     ],
     controllers: [AppController, HealthController],
     providers: [
@@ -72,6 +81,7 @@ const environment = (process.env.NODE_ENV || 'production');
 export class AppModule {
     constructor(private config: ConfigService) {
     }
+
     configure(consumer: MiddlewareConsumer) {
         consumer
             .apply(cookieSession({

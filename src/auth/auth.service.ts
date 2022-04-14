@@ -1,16 +1,21 @@
-import {Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
+import {BadRequestException, Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
+import {EventEmitter2} from "@nestjs/event-emitter";
 import {UsersService} from "../users/users.service";
 import {isEmail} from "class-validator";
 import {User} from "../users/entities/user.entity";
 import {promisify} from "util";
-import {randomBytes, scrypt as _scrypt} from "crypto";
+import {scrypt as _scrypt} from "crypto";
 import {RegisterUserDto} from "./dto/register-user.dto";
+import {ON_USER_REGISTERED, UserRegisterEvent} from "./events/user-register.event";
 
 const scrypt = promisify(_scrypt);
 
 @Injectable()
 export class AuthService {
-    constructor(private userService: UsersService) {
+    constructor(
+        private userService: UsersService,
+        private eventEmitter: EventEmitter2
+    ) {
     }
 
     async login(username: string, password: string) {
@@ -23,6 +28,9 @@ export class AuthService {
         if (!user) {
             throw new NotFoundException('User not found');
         }
+        if (!user.isActive) {
+            throw new BadRequestException('Status user is inactive');
+        }
 
         const [salt, storedHash] = user.password.split('.');
         const hash = (await scrypt(password, salt, 32)) as Buffer;
@@ -34,6 +42,11 @@ export class AuthService {
     }
 
     async register(registerUser: RegisterUserDto) {
-        return this.userService.create(registerUser);
+        const user = await this.userService.create(registerUser);
+        if (user) {
+            this.eventEmitter.emit(ON_USER_REGISTERED, new UserRegisterEvent(user));
+            return user;
+        }
+        return null;
     }
 }
