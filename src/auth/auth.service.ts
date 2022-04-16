@@ -7,6 +7,9 @@ import {promisify} from "util";
 import {scrypt as _scrypt} from "crypto";
 import {RegisterUserDto} from "./dto/register-user.dto";
 import {ON_USER_REGISTERED, UserRegisterEvent} from "./events/user-register.event";
+import {UtilityService} from "../utility/utility.service";
+import {plainToInstance} from "class-transformer";
+import {TokenPayloadDto} from "./dto/token-payload.dto";
 
 const scrypt = promisify(_scrypt);
 
@@ -14,10 +17,17 @@ const scrypt = promisify(_scrypt);
 export class AuthService {
     constructor(
         private userService: UsersService,
-        private eventEmitter: EventEmitter2
+        private eventEmitter: EventEmitter2,
+        private utilityService: UtilityService
     ) {
     }
 
+    /**
+     * Authenticate user by given the credentials.
+     *
+     * @param username
+     * @param password
+     */
     async login(username: string, password: string) {
         let user: User;
         if (isEmail(username)) {
@@ -41,6 +51,11 @@ export class AuthService {
         throw new UnauthorizedException('Password is wrong');
     }
 
+    /**
+     * Register user and emit even ON_USER_REGISTERED.
+     *
+     * @param registerUser
+     */
     async register(registerUser: RegisterUserDto) {
         const user = await this.userService.create(registerUser);
         if (user) {
@@ -48,5 +63,31 @@ export class AuthService {
             return user;
         }
         return null;
+    }
+
+    /**
+     * Activate user account by valid token.
+     *
+     * @param token
+     */
+    async confirmAccount(token: string) {
+        const decodedToken = JSON.parse(Buffer.from(token, 'base64').toString('ascii'));
+        const payload = JSON.parse(this.utilityService.decrypt(decodedToken));
+        const tokenPayload = plainToInstance(TokenPayloadDto, payload);
+        const {email, type, expiredAt} = tokenPayload;
+
+        const isInvalidType = type !== 'account_activation';
+        const isExpired = (new Date()) > (new Date(expiredAt));
+
+        if (isExpired || isInvalidType) {
+            throw new BadRequestException("Token is expired or invalid request type")
+        }
+
+        const user = await this.userService.findByEmail(email);
+        if (!user) {
+            throw new NotFoundException("User not found")
+        }
+
+        return this.userService.activateUser(user);
     }
 }

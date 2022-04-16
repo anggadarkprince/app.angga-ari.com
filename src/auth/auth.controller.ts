@@ -1,10 +1,11 @@
-import {Body, Controller, Get, HttpCode, Post, Session, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, Post, Query, Session, UseGuards} from '@nestjs/common';
 import {CredentialDto} from "./dto/credential.dto";
 import {AuthService} from "./auth.service";
 import {AuthGuard} from "../guards/auth.guard";
 import {User} from "../users/entities/user.entity";
 import {CurrentUser} from "../users/decorators/current-user.decorator";
 import {RegisterUserDto} from "./dto/register-user.dto";
+import {TokenQueryDto} from "./dto/token-query.dto";
 
 @Controller()
 export class AuthController {
@@ -21,7 +22,12 @@ export class AuthController {
 
     @Post('register')
     async register(@Body() body: RegisterUserDto) {
-        return  await this.authService.register(body);
+        return await this.authService.register(body);
+    }
+
+    @Get('auth/confirm')
+    async confirm(@Query() query: TokenQueryDto) {
+        return await this.authService.confirmAccount(query.token);
     }
 
     @Post('logout')

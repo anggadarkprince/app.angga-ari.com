@@ -62,6 +62,15 @@ export class UsersService {
         return this.repo.save(user);
     }
 
+    async activateUser(user: User | number) {
+        if (typeof user === 'number') {
+            user = await this.findOne(user);
+        }
+        user.isActive = true;
+
+        return this.repo.save(user);
+    }
+
     async remove(id: number) {
         const user = await this.findOne(id);
         if (!user) {
