@@ -1,4 +1,4 @@
-import {Body, Controller, Get, HttpCode, Post, Query, Session, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, Patch, Post, Query, Session, UseGuards} from '@nestjs/common';
 import {CredentialDto} from "./dto/credential.dto";
 import {AuthService} from "./auth.service";
 import {AuthGuard} from "../guards/auth.guard";
@@ -6,6 +6,7 @@ import {User} from "../users/entities/user.entity";
 import {CurrentUser} from "../users/decorators/current-user.decorator";
 import {RegisterUserDto} from "./dto/register-user.dto";
 import {TokenQueryDto} from "./dto/token-query.dto";
+import {ResetPasswordDto} from "./dto/reset-password.dto";
 
 @Controller()
 export class AuthController {
@@ -28,6 +29,16 @@ export class AuthController {
     @Get('auth/confirm')
     async confirm(@Query() query: TokenQueryDto) {
         return await this.authService.confirmAccount(query.token);
+    }
+
+    @Post('auth/forgot-password')
+    async forgotPassword(@Body('email') email: string) {
+        return await this.authService.forgotPassword(email);
+    }
+
+    @Patch('auth/reset-password')
+    async resetPassword(@Body() body: ResetPasswordDto, @Query() query: TokenQueryDto) {
+        return await this.authService.resetPassword(body.newPassword, query.token);
     }
 
     @Post('logout')

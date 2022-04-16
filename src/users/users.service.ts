@@ -15,34 +15,71 @@ export class UsersService {
     constructor(@InjectRepository(User) private repo: Repository<User>) {
     }
 
-    async create(createUserDto: CreateUserDto) {
-        const password: string = createUserDto.password;
-
+    /**
+     * Hash plain text password.
+     *
+     * @param password
+     * @private
+     */
+    private static async hashPassword(password: string) {
         const salt = randomBytes(8).toString('hex');
         const hash = (await scrypt(password, salt, 32)) as Buffer;
-        createUserDto.password = salt + '.' + hash.toString('hex');
+        return salt + '.' + hash.toString('hex');
+    }
+
+    /**
+     * Create new user.
+     *
+     * @param createUserDto
+     */
+    async create(createUserDto: CreateUserDto) {
+        createUserDto.password = await UsersService.hashPassword(createUserDto.password);
 
         const user = this.repo.create(createUserDto);
 
         return this.repo.save(user);
     }
 
+    /**
+     * Find all user data.
+     */
     findAll() {
         return this.repo.find();
     }
 
+    /**
+     * Find user by id.
+     *
+     * @param id
+     */
     findOne(id: number) {
         return this.repo.findOne(id);
     }
 
+    /**
+     * Find user by email address.
+     *
+     * @param email
+     */
     findByEmail(email: string) {
         return this.repo.findOne({email: email});
     }
 
+    /**
+     * Find user by username.
+     *
+     * @param username
+     */
     findByUsername(username: string) {
         return this.repo.findOne({username: username});
     }
 
+    /**
+     * Update user account.
+     *
+     * @param id
+     * @param updateUserDto
+     */
     async update(id: number, updateUserDto: UpdateUserDto) {
         const existingEmail = await this.findByEmail(updateUserDto.email);
         if (existingEmail && existingEmail.id != id) {
@@ -62,6 +99,11 @@ export class UsersService {
         return this.repo.save(user);
     }
 
+    /**
+     * Activate user account.
+     *
+     * @param user
+     */
     async activateUser(user: User | number) {
         if (typeof user === 'number') {
             user = await this.findOne(user);
@@ -71,6 +113,26 @@ export class UsersService {
         return this.repo.save(user);
     }
 
+    /**
+     * Change user's password.
+     *
+     * @param user
+     * @param password
+     */
+    async changePassword(user: User | number, password: string) {
+        if (typeof user === 'number') {
+            user = await this.findOne(user);
+        }
+        user.password = await UsersService.hashPassword(password);
+
+        return this.repo.save(user);
+    }
+
+    /**
+     * Remove password.
+     *
+     * @param id
+     */
     async remove(id: number) {
         const user = await this.findOne(id);
         if (!user) {

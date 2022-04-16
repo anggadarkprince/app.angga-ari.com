@@ -10,6 +10,9 @@ import {ON_USER_REGISTERED, UserRegisterEvent} from "./events/user-register.even
 import {UtilityService} from "../utility/utility.service";
 import {plainToInstance} from "class-transformer";
 import {TokenPayloadDto} from "./dto/token-payload.dto";
+import {TOKEN_ACCOUNT_ACTIVATION, TOKEN_RESET_PASSWORD} from "./constants/auth";
+import {ON_USER_FORGOT_PASSWORD, UserForgotPasswordEvent} from "./events/user-forgot-password.event";
+import {ResetPasswordDto} from "./dto/reset-password.dto";
 
 const scrypt = promisify(_scrypt);
 
@@ -65,29 +68,78 @@ export class AuthService {
         return null;
     }
 
+    private extractTokenPayload(token: string) {
+        const decodedToken = JSON.parse(Buffer.from(token, 'base64').toString('ascii'));
+        const payload = JSON.parse(this.utilityService.decrypt(decodedToken));
+        return plainToInstance(TokenPayloadDto, payload);
+    }
+
     /**
      * Activate user account by valid token.
      *
      * @param token
      */
     async confirmAccount(token: string) {
-        const decodedToken = JSON.parse(Buffer.from(token, 'base64').toString('ascii'));
-        const payload = JSON.parse(this.utilityService.decrypt(decodedToken));
-        const tokenPayload = plainToInstance(TokenPayloadDto, payload);
+        const tokenPayload = this.extractTokenPayload(token);
         const {email, type, expiredAt} = tokenPayload;
 
-        const isInvalidType = type !== 'account_activation';
+        const isInvalidType = type !== TOKEN_ACCOUNT_ACTIVATION;
         const isExpired = (new Date()) > (new Date(expiredAt));
 
         if (isExpired || isInvalidType) {
-            throw new BadRequestException("Token is expired or invalid request type")
+            throw new BadRequestException("Token is expired or invalid request type");
         }
 
         const user = await this.userService.findByEmail(email);
         if (!user) {
-            throw new NotFoundException("User not found")
+            throw new NotFoundException("User not found");
+        }
+
+        if (user.isActive) {
+            throw new BadRequestException("User is already activated");
         }
 
         return this.userService.activateUser(user);
+    }
+
+    /**
+     * Send forgot password link.
+     *
+     * @param email
+     */
+    async forgotPassword(email: string) {
+        const user = await this.userService.findByEmail(email);
+        if (!user) {
+            throw new NotFoundException("User not found");
+        }
+
+        this.eventEmitter.emit(ON_USER_FORGOT_PASSWORD, new UserForgotPasswordEvent(user));
+
+        return user;
+    }
+
+    /**
+     * Reset password user.
+     *
+     * @param password
+     * @param token
+     */
+    async resetPassword(password: string, token: string) {
+        const tokenPayload = this.extractTokenPayload(token);
+        const {email, type, expiredAt} = tokenPayload;
+
+        const isInvalidType = type !== TOKEN_RESET_PASSWORD;
+        const isExpired = (new Date()) > (new Date(expiredAt));
+
+        if (isExpired || isInvalidType) {
+            throw new BadRequestException("Token is expired or invalid request type");
+        }
+
+        const user = await this.userService.findByEmail(email);
+        if (!user) {
+            throw new NotFoundException("User not found");
+        }
+
+        return this.userService.changePassword(user, password);
     }
 }
