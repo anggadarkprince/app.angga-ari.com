@@ -10,6 +10,7 @@ import appConfig from "./config/app.config";
 import databaseConfig from "./config/database.config";
 import cookieConfig from "./config/cookie.config";
 import emailConfig from "./config/email.config";
+import storageConfig from "./config/storage.config";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {UsersModule} from './users/users.module';
 import {APP_PIPE} from "@nestjs/core";
@@ -18,6 +19,8 @@ import {ShowcasesModule} from './showcases/showcases.module';
 import {EventEmitterModule} from "@nestjs/event-emitter";
 import {MailModule} from './mail/mail.module';
 import { UtilityModule } from './utility/utility.module';
+import { UploadModule } from './upload/upload.module';
+import {MulterModule} from "@nestjs/platform-express";
 
 const cookieSession = require('cookie-session');
 const environment = (process.env.NODE_ENV || 'production');
@@ -40,6 +43,7 @@ const environment = (process.env.NODE_ENV || 'production');
                 databaseConfig,
                 cookieConfig,
                 emailConfig,
+                storageConfig,
             ],
         }),
         TypeOrmModule.forRootAsync({
@@ -60,12 +64,20 @@ const environment = (process.env.NODE_ENV || 'production');
                 logging: environment != 'production',
             }),
         }),
+        MulterModule.registerAsync({
+            imports: [ConfigModule],
+            useFactory: async (configService: ConfigService) => ({
+                dest: configService.get<string>('storage.dest'),
+            }),
+            inject: [ConfigService],
+        }),
         EventEmitterModule.forRoot(),
         UsersModule,
         AuthModule,
         ShowcasesModule,
         MailModule,
         UtilityModule,
+        UploadModule,
     ],
     controllers: [AppController, HealthController],
     providers: [
