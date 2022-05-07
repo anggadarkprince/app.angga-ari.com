@@ -1,16 +1,28 @@
-import {Body, Controller, Post, UploadedFile, UseInterceptors} from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    NotFoundException,
+    Post,
+    Query,
+    Res,
+    UploadedFile,
+    UseInterceptors
+} from '@nestjs/common';
+import * as path from 'path';
+import * as mime from 'mime-types';
 import {FileInterceptor} from "@nestjs/platform-express";
 import {diskStorage} from "multer";
 import {UploadService} from "./upload.service";
 import {UploadDto} from "./dto/upload.dto";
 
-@Controller('upload')
+@Controller()
 export class UploadController {
 
     constructor(private uploadService: UploadService) {
     }
 
-    @Post('file')
+    @Post('upload')
     @UseInterceptors(FileInterceptor('file'/*, {
         storage: diskStorage({
             destination: './uploads',
@@ -31,5 +43,29 @@ export class UploadController {
             size: file.size,
             url: result.url,
         };
+    }
+
+    @Get('storage')
+    async getUploadedFile(@Query() query, @Res() res) {
+        let {key, driver} = query;
+        if (!driver) {
+            driver = this.uploadService.driver();
+        }
+
+        try {
+            if (driver === 's3') {
+                res.set({
+                    'Content-Disposition': `inline; filename="${path.basename(key)}"`,
+                    'Content-Type': mime.lookup(key) || 'application/octet-stream'
+                })
+                const stream = this.uploadService.getStream(key);
+
+                return stream.pipe(res);
+            } else {
+                return res.sendFile(path, { root: this.uploadService.basePath });
+            }
+        } catch (e) {
+            throw new NotFoundException()
+        }
     }
 }

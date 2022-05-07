@@ -1,9 +1,10 @@
-import {Injectable} from '@nestjs/common';
+import {Injectable, NotFoundException} from '@nestjs/common';
 import * as path from 'path';
 import * as fs from 'fs';
 import {ConfigService} from "@nestjs/config";
 import {UploadResultDto} from "./dto/upload-result.dto";
 import * as S3 from 'aws-sdk/clients/s3';
+import {Readable} from "stream";
 
 export type StorageType = 'local' | 's3';
 
@@ -15,7 +16,7 @@ interface UploadOptions {
 
 @Injectable()
 export class UploadService {
-    private readonly basePath;
+    public readonly basePath;
     private readonly s3;
     private defaultDriver;
 
@@ -39,7 +40,10 @@ export class UploadService {
         return `${name}-${randomName}${fileExtName}`;
     }
 
-    driver(driver: StorageType) {
+    driver(driver?: StorageType) {
+        if (!driver) {
+            return this.defaultDriver;
+        }
         this.defaultDriver = driver;
     }
 
@@ -106,7 +110,20 @@ export class UploadService {
         }
     }
 
-    url(path: string) {
+    getUrl(path: string) {
         return this.basePath + '/' + path;
+    }
+
+    getStream(key: string) {
+        const s3 = new S3({
+            endpoint: this.s3.endpoint,
+            accessKeyId: this.s3.accessKey,
+            secretAccessKey: this.s3.secretKey,
+        });
+        const getObject = s3.getObject({
+            Bucket: this.s3.bucket,
+            Key: key
+        });
+        return getObject.createReadStream();
     }
 }
