@@ -21,6 +21,7 @@ import {MailModule} from './mail/mail.module';
 import { UtilityModule } from './utility/utility.module';
 import { UploadModule } from './upload/upload.module';
 import {MulterModule} from "@nestjs/platform-express";
+import { ExpertisesModule } from './expertises/expertises.module';
 
 const cookieSession = require('cookie-session');
 const environment = (process.env.NODE_ENV || 'production');
@@ -78,6 +79,7 @@ const environment = (process.env.NODE_ENV || 'production');
         MailModule,
         UtilityModule,
         UploadModule,
+        ExpertisesModule,
     ],
     controllers: [AppController, HealthController],
     providers: [
