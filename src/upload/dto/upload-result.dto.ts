@@ -1,22 +1,22 @@
-import {IsNumber, IsOptional, IsString} from "class-validator";
-import {StorageType} from "../upload.service";
+import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { StorageType } from '../upload.service';
 
 export class UploadResultDto {
-    @IsString()
-    uploadedPath: string;
+  @IsString()
+  uploadedPath: string;
 
-    @IsOptional()
-    source: Express.Multer.File = null;
+  @IsOptional()
+  source: Express.Multer.File = null;
 
-    @IsString()
-    mimeType: string;
+  @IsString()
+  mimeType: string;
 
-    @IsNumber()
-    size: number;
+  @IsNumber()
+  size: number;
 
-    @IsNumber()
-    url?: string;
+  @IsNumber()
+  url?: string;
 
-    @IsString()
-    driver?: StorageType;
+  @IsString()
+  driver?: StorageType;
 }

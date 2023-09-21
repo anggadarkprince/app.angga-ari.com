@@ -1,8 +1,7 @@
-import {User} from "../../users/entities/user.entity";
+import { User } from '../../users/entities/user.entity';
 
 export class UserForgotPasswordEvent {
-    constructor(public user: User) {
-    }
+  constructor(public user: User) {}
 }
 
-export const ON_USER_FORGOT_PASSWORD = 'user.forgot-password'
+export const ON_USER_FORGOT_PASSWORD = 'user.forgot-password';
