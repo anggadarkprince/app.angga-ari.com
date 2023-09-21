@@ -6,7 +6,7 @@ import {
 import { CreateExpertiseDto } from './dto/create-expertise.dto';
 import { UpdateExpertiseDto } from './dto/update-expertise.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Expertise } from './entities/expertise.entity';
 import { User } from '../users/entities/user.entity';
 import { FilterExpertise } from './dto/filter-expertise.dto';
@@ -53,7 +53,7 @@ export class ExpertisesService {
   }
 
   async findOne(id: number) {
-    const expertise = this.repo.findOne({
+    const expertise = await this.repo.findOne({
       where: { id: +id },
       relations: ['skills'],
     });

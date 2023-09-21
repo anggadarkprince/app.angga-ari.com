@@ -22,6 +22,7 @@ import { UtilityModule } from './utility/utility.module';
 import { UploadModule } from './upload/upload.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { ExpertisesModule } from './expertises/expertises.module';
+import { ExperiencesModule } from './experiences/experiences.module';
 
 const cookieSession = require('cookie-session');
 const environment = process.env.NODE_ENV || 'production';
@@ -82,6 +83,7 @@ const environment = process.env.NODE_ENV || 'production';
     UtilityModule,
     UploadModule,
     ExpertisesModule,
+    ExperiencesModule,
   ],
   controllers: [AppController, HealthController],
   providers: [

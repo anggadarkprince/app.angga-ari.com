@@ -6,11 +6,11 @@ import {
   TableIndex,
 } from 'typeorm';
 
-export class CreateExpertisesTable1695198974668 implements MigrationInterface {
+export class CreateExperienceTable1695281530868 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'expertises',
+        name: 'experiences',
         columns: [
           {
             name: 'id',
@@ -21,24 +21,25 @@ export class CreateExpertisesTable1695198974668 implements MigrationInterface {
             generationStrategy: 'increment',
           },
           { name: 'user_id', type: 'int', unsigned: true },
-          { name: 'section_id', type: 'int', unsigned: true, isNullable: true },
-          { name: 'title', type: 'varchar', length: '50', isNullable: true },
           {
-            name: 'subtitle',
+            name: 'label',
             type: 'varchar',
-            length: '300',
+            length: '50',
             isNullable: true,
           },
-          { name: 'level', type: 'smallint', unsigned: true, default: 1 },
+          { name: 'title', type: 'varchar', length: '100' },
+          { name: 'subtitle', type: 'varchar', length: '300' },
+          { name: 'description', type: 'text', isNullable: true },
+          { name: 'from', type: 'date' },
+          { name: 'to', type: 'date', isNullable: true },
           { name: 'created_at', type: 'timestamp', default: 'now()' },
           { name: 'updated_at', type: 'timestamp', isNullable: true },
         ],
       }),
-      true,
     );
 
     await queryRunner.createForeignKey(
-      'expertises',
+      'experiences',
       new TableForeignKey({
         columnNames: ['user_id'],
         referencedColumnNames: ['id'],
@@ -48,27 +49,16 @@ export class CreateExpertisesTable1695198974668 implements MigrationInterface {
       }),
     );
 
-    await queryRunner.createForeignKey(
-      'expertises',
-      new TableForeignKey({
-        columnNames: ['section_id'],
-        referencedColumnNames: ['id'],
-        referencedTableName: 'expertises',
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
-      }),
-    );
-
     await queryRunner.createIndex(
-      'expertises',
+      'experiences',
       new TableIndex({
-        name: 'idx_expertise_title_content',
+        name: 'idx_experience_title_content',
         columnNames: ['title', 'subtitle'],
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('expertises', true);
+    await queryRunner.dropTable('experiences', true);
   }
 }
