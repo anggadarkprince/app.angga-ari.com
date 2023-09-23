@@ -1,5 +1,22 @@
 import { ValidationError } from 'class-validator';
-import { BadRequestException } from '@nestjs/common';
+import { HttpException } from '@nestjs/common/exceptions/http.exception';
+
+export class ValidationException extends HttpException {
+  constructor(
+    errors: string | Record<string, any>,
+    message?: string,
+    status = 422,
+  ) {
+    super(
+      {
+        status: 'validation-error',
+        message: message || 'Invalid data submission',
+        errors: errors,
+      },
+      status,
+    );
+  }
+}
 
 export const validationExceptionFactory = (
   validationErrors: ValidationError[] = [],
@@ -13,8 +30,5 @@ export const validationExceptionFactory = (
       Object.values(error.constraints),
     );
   });
-  return new BadRequestException({
-    status: 'validation-error',
-    errors: errorMessages,
-  });
+  return new ValidationException(errorMessages);
 };

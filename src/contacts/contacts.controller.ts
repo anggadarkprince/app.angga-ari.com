@@ -30,9 +30,14 @@ export class ContactsController {
     return this.contactService.findAll(filters);
   }
 
+  @Get(':id')
+  findOne(@Param('id') id: number) {
+    return this.contactService.findOne(id);
+  }
+
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string) {
-    return this.contactService.remove(+id);
+  remove(@Param('id') id: number) {
+    return this.contactService.remove(id);
   }
 }

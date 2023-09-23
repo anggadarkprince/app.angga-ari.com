@@ -11,6 +11,7 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
 
     response.status(500).json({
       code: 500,
+      status: 'server-error',
       message: 'Internal server error',
       errors: exception.message || '',
       meta: {
