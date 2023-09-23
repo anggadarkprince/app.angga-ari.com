@@ -8,13 +8,16 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ExperiencesService } from './experiences.service';
 import { CreateExperienceDto } from './dto/create-experience.dto';
 import { UpdateExperienceDto } from './dto/update-experience.dto';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
+import { TransformInterceptor } from '../common/interceptors/transformer.interceptor';
 
+@UseInterceptors(TransformInterceptor)
 @Controller('experiences')
 export class ExperiencesController {
   constructor(private readonly experiencesService: ExperiencesService) {}

@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ExpertisesService } from './expertises.service';
 import { CreateExpertiseDto } from './dto/create-expertise.dto';
@@ -17,7 +18,9 @@ import { UpdateExpertiseDto } from './dto/update-expertise.dto';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { FilterExpertise } from './dto/filter-expertise.dto';
+import { TransformInterceptor } from '../common/interceptors/transformer.interceptor';
 
+@UseInterceptors(TransformInterceptor)
 @Controller('expertises')
 export class ExpertisesController {
   constructor(private readonly expertisesService: ExpertisesService) {}
@@ -36,14 +39,8 @@ export class ExpertisesController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    const expertise = await this.expertisesService.findOne(+id);
-
-    if (expertise === undefined) {
-      throw new NotFoundException('Expertise not found');
-    }
-
-    return expertise;
+  findOne(@Param('id') id: string) {
+    return this.expertisesService.findOne(+id);
   }
 
   @Patch(':id')

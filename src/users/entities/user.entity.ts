@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Showcase } from '../../showcases/entities/showcase.entity';
+import { classToPlain, Exclude, instanceToPlain } from 'class-transformer';
 
 @Entity({ name: 'users' })
 export class User {
@@ -23,6 +24,7 @@ export class User {
   email: string;
 
   @Column({ length: 200 })
+  @Exclude({ toPlainOnly: true })
   password: string;
 
   @Column({ name: 'is_active', default: true })

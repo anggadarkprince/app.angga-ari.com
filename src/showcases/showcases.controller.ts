@@ -7,14 +7,17 @@ import {
   Patch,
   Post,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ShowcasesService } from './showcases.service';
 import { CreateShowcaseDto } from './dto/create-showcase.dto';
 import { UpdateShowcaseDto } from './dto/update-showcase.dto';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { AuthGuard } from '../guards/auth.guard';
+import { TransformInterceptor } from '../common/interceptors/transformer.interceptor';
 
 @UseGuards(AuthGuard)
+@UseInterceptors(TransformInterceptor)
 @Controller('showcases')
 export class ShowcasesController {
   constructor(private showcaseService: ShowcasesService) {}

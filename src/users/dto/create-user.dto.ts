@@ -2,7 +2,6 @@ import {
   IsBoolean,
   IsEmail,
   IsString,
-  Length,
   MaxLength,
   MinLength,
   Validate,
@@ -31,5 +30,5 @@ export class CreateUserDto {
   password: string;
 
   @IsBoolean()
-  isActive: boolean = true;
+  isActive = true;
 }

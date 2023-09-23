@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  MiddlewareConsumer,
+  Module,
+  ValidationPipe,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HealthController } from './health/health.controller';
@@ -13,7 +18,7 @@ import emailConfig from './config/email.config';
 import storageConfig from './config/storage.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
-import { APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 import { ShowcasesModule } from './showcases/showcases.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -23,6 +28,10 @@ import { UploadModule } from './upload/upload.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { ExpertisesModule } from './expertises/expertises.module';
 import { ExperiencesModule } from './experiences/experiences.module';
+import { ContactsModule } from './contacts/contacts.module';
+import { HttpExceptionFilter } from './common/exceptions/http-exception.filter';
+import { validationExceptionFactory } from './common/exceptions/validation-exception';
+import { AllExceptionsFilter } from './common/exceptions/all-exceptions.filter';
 
 const cookieSession = require('cookie-session');
 const environment = process.env.NODE_ENV || 'production';
@@ -84,6 +93,7 @@ const environment = process.env.NODE_ENV || 'production';
     UploadModule,
     ExpertisesModule,
     ExperiencesModule,
+    ContactsModule,
   ],
   controllers: [AppController, HealthController],
   providers: [
@@ -92,7 +102,16 @@ const environment = process.env.NODE_ENV || 'production';
       provide: APP_PIPE,
       useValue: new ValidationPipe({
         whitelist: true,
+        exceptionFactory: validationExceptionFactory,
       }),
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
     },
   ],
 })
