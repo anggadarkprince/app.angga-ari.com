@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Like, Repository } from 'typeorm';
 import { Contact } from './entities/contact.entity';
@@ -6,10 +6,16 @@ import { CreateMessageDto } from './dto/create-message.dto';
 import { FilterMessage } from './dto/filter-message.dto';
 import { PageDto } from '../common/dto/page.dto';
 import { PageMetaDto } from '../common/dto/page-meta.dto';
+import { MailService } from '../mail/mail.service';
+import {ReplyMessageDto} from "./dto/reply-message.dto";
+import {STATUS_REPLIED} from "./constants/status";
 
 @Injectable()
 export class ContactsService {
-  constructor(@InjectRepository(Contact) private repo: Repository<Contact>) {}
+  constructor(
+    @InjectRepository(Contact) private repo: Repository<Contact>,
+    private mailService: MailService,
+  ) {}
 
   create(createMessageDto: CreateMessageDto) {
     const contact = this.repo.create(createMessageDto);
@@ -71,5 +77,21 @@ export class ContactsService {
     const contact = await this.findOne(id);
 
     return this.repo.remove(contact);
+  }
+
+  async reply(id: number, replyMessage: ReplyMessageDto) {
+    const contact = await this.findOne(id);
+
+    const result = this.mailService.replyContactMessage(
+      contact,
+      replyMessage.subject,
+      replyMessage.message,
+    );
+
+    if (result) {
+      contact.status = STATUS_REPLIED;
+      return this.repo.save(contact);
+    }
+    throw new BadRequestException('Reply email failed');
   }
 }

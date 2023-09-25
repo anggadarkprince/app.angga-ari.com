@@ -24,6 +24,9 @@ export class Contact {
   @Column({ length: 1000 })
   message: string;
 
+  @Column({ length: 50 })
+  status?: string;
+
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;
 

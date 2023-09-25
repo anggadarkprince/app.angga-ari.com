@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { User } from '../users/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
+import {Contact} from "../contacts/entities/contact.entity";
 
 @Injectable()
 export class MailService {
@@ -54,6 +55,20 @@ export class MailService {
         email: user.email,
         email_admin: this.configService.get('email.fromAddress'),
         url,
+      },
+    });
+  }
+
+  replyContactMessage(contact: Contact, title: string, message: string) {
+    return this.mailerService.sendMail({
+      to: contact.email,
+      subject: title,
+      template: 'reply-message',
+      context: {
+        name: contact.name,
+        email: contact.email,
+        email_admin: this.configService.get('email.fromAddress'),
+        message: message,
       },
     });
   }
