@@ -27,6 +27,7 @@ import {
   UserForgotPasswordEvent,
 } from './events/user-forgot-password.event';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { JwtService } from '@nestjs/jwt';
 
 const scrypt = promisify(_scrypt);
 
@@ -36,6 +37,7 @@ export class AuthService {
     private userService: UsersService,
     private eventEmitter: EventEmitter2,
     private utilityService: UtilityService,
+    private jwtService: JwtService,
   ) {}
 
   /**
@@ -62,7 +64,15 @@ export class AuthService {
     const hash = (await scrypt(password, salt, 32)) as Buffer;
 
     if (storedHash === hash.toString('hex')) {
-      return user;
+      const payload = {
+        sub: user.id,
+        username: user.username,
+        email: user.email,
+      };
+      const tokens = {
+        access_token: await this.jwtService.signAsync(payload),
+      };
+      return { data: user, meta: tokens };
     }
     throw new UnauthorizedException('Password is wrong');
   }

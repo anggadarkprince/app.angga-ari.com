@@ -12,7 +12,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AuthGuard } from '../guards/auth.guard';
+import { AuthGuard } from '../auth/guards/auth.guard';
 import { TransformInterceptor } from '../common/interceptors/transformer.interceptor';
 
 @UseGuards(AuthGuard)

@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { map } from 'rxjs';
 import { instanceToPlain } from 'class-transformer';
-import {getStatusLabel} from "../constants/status-code";
+import { getStatusLabel } from '../constants/status-code';
 
 export interface ApiResponseType<T> {
   code: number;

@@ -3,31 +3,36 @@ import {
   Controller,
   Get,
   HttpCode,
+  HttpStatus,
   Patch,
   Post,
   Query,
   Session,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CredentialDto } from './dto/credential.dto';
 import { AuthService } from './auth.service';
-import { AuthGuard } from '../guards/auth.guard';
+import { AuthGuard } from './guards/auth.guard';
 import { User } from '../users/entities/user.entity';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { TokenQueryDto } from './dto/token-query.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { TransformInterceptor } from '../common/interceptors/transformer.interceptor';
 
+@UseInterceptors(TransformInterceptor)
 @Controller()
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('auth')
+  @HttpCode(HttpStatus.OK)
   async login(@Body() body: CredentialDto, @Session() session: any) {
-    const user = await this.authService.login(body.username, body.password);
-    session.userId = user.id;
+    const data = await this.authService.login(body.username, body.password);
+    session.userId = data.data.id;
 
-    return user;
+    return data;
   }
 
   @Post('register')

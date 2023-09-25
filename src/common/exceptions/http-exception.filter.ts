@@ -30,13 +30,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
     };
     const originalResponse = exception.getResponse() as OriginalResponseType;
     const objectOrErrorIsString =
-      originalResponse.statusCode &&
-      originalResponse.message &&
-      originalResponse.error;
+      originalResponse.statusCode && originalResponse.message;
     let apiResponse: ApiResponseType<any> = {
       code: code,
     };
 
+    console.info(originalResponse);
     if (!apiResponse.status) {
       apiResponse.status = getStatusLabel(apiResponse.code);
     }

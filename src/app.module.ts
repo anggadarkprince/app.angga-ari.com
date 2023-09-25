@@ -12,6 +12,7 @@ import { HttpModule } from '@nestjs/axios';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import appConfig from './config/app.config';
+import authConfig from './config/auth.config';
 import databaseConfig from './config/database.config';
 import cookieConfig from './config/cookie.config';
 import emailConfig from './config/email.config';
@@ -57,6 +58,7 @@ const environment = process.env.NODE_ENV || 'production';
         cookieConfig,
         emailConfig,
         storageConfig,
+        authConfig,
       ],
     }),
     TypeOrmModule.forRootAsync({
