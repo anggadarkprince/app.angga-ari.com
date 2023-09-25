@@ -1,4 +1,8 @@
-import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
+import {
+  BadRequestException, ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Like, Repository } from 'typeorm';
 import { Contact } from './entities/contact.entity';
@@ -7,8 +11,12 @@ import { FilterMessage } from './dto/filter-message.dto';
 import { PageDto } from '../common/dto/page.dto';
 import { PageMetaDto } from '../common/dto/page-meta.dto';
 import { MailService } from '../mail/mail.service';
-import {ReplyMessageDto} from "./dto/reply-message.dto";
-import {STATUS_REPLIED} from "./constants/status";
+import { ReplyMessageDto } from './dto/reply-message.dto';
+import {
+  STATUS_HOLD,
+  STATUS_REJECTED,
+  STATUS_REPLIED,
+} from './constants/status';
 
 @Injectable()
 export class ContactsService {
@@ -93,5 +101,23 @@ export class ContactsService {
       return this.repo.save(contact);
     }
     throw new BadRequestException('Reply email failed');
+  }
+
+  async reject(id: number) {
+    const contact = await this.findOne(id);
+    if (contact.status == STATUS_REPLIED) {
+      throw new ConflictException('Cannot reject "REPLIED" message');
+    }
+    contact.status = STATUS_REJECTED;
+    return this.repo.save(contact);
+  }
+
+  async hold(id: number) {
+    const contact = await this.findOne(id);
+    if (contact.status == STATUS_REPLIED) {
+      throw new ConflictException('Cannot hold "REPLIED" message');
+    }
+    contact.status = STATUS_HOLD;
+    return this.repo.save(contact);
   }
 }

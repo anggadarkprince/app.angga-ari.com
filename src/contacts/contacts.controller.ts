@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -51,5 +52,15 @@ export class ContactsController {
   @HttpCode(HttpStatus.OK)
   reply(@Param('id') id: number, @Body() replyMessage: ReplyMessageDto) {
     return this.contactService.reply(id, replyMessage);
+  }
+
+  @Patch(':id/reject')
+  reject(@Param('id') id: number) {
+    return this.contactService.reject(id);
+  }
+
+  @Patch(':id/hold')
+  hold(@Param('id') id: number) {
+    return this.contactService.hold(id);
   }
 }
