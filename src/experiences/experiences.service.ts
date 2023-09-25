@@ -36,20 +36,13 @@ export class ExperiencesService {
 
   async update(id: number, updateExperienceDto: UpdateExperienceDto) {
     const experience = await this.findOne(id);
-    if (!experience) {
-      throw new NotFoundException('Experience not found');
-    }
     Object.assign(experience, updateExperienceDto);
+
     return this.repo.save(experience);
   }
 
   async remove(id: number) {
-    const experience = await this.repo.findOne({
-      where: { id: +id },
-    });
-    if (!experience) {
-      throw new NotFoundException('Experience not found');
-    }
+    const experience = await this.findOne(id);
 
     return this.repo.remove(experience);
   }

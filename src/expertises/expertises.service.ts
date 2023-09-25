@@ -66,18 +66,13 @@ export class ExpertisesService {
 
   async update(id: number, updateExpertiseDto: UpdateExpertiseDto) {
     const expertise = await this.findOne(id);
-    if (!expertise) {
-      throw new NotFoundException('Expertise not found');
-    }
     Object.assign(expertise, updateExpertiseDto);
+
     return this.repo.save(expertise);
   }
 
   async remove(id: number) {
     const expertise = await this.findOne(id);
-    if (!expertise) {
-      throw new NotFoundException('Expertise not found');
-    }
 
     return this.repo.remove(expertise);
   }

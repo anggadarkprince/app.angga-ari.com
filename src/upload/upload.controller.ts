@@ -7,15 +7,17 @@ import {
   Query,
   Res,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import * as path from 'path';
 import * as mime from 'mime-types';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 import { UploadService } from './upload.service';
 import { UploadDto } from './dto/upload.dto';
+import { AuthGuard } from '../auth/guards/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller()
 export class UploadController {
   constructor(private uploadService: UploadService) {}

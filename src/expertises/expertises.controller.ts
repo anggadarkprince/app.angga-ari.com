@@ -6,11 +6,11 @@ import {
   Patch,
   Param,
   Delete,
-  NotFoundException,
   HttpCode,
   HttpStatus,
   Query,
   UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
 import { ExpertisesService } from './expertises.service';
 import { CreateExpertiseDto } from './dto/create-expertise.dto';
@@ -19,7 +19,9 @@ import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { FilterExpertise } from './dto/filter-expertise.dto';
 import { TransformInterceptor } from '../common/interceptors/transformer.interceptor';
+import { AuthGuard } from '../auth/guards/auth.guard';
 
+@UseGuards(AuthGuard)
 @UseInterceptors(TransformInterceptor)
 @Controller('expertises')
 export class ExpertisesController {

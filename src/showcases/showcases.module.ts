@@ -4,8 +4,6 @@ import { ShowcasesService } from './showcases.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Showcase } from './entities/showcase.entity';
 import { ShowcasePhoto } from './entities/showcase-photo.entity';
-import { APP_GUARD } from '@nestjs/core';
-import { AuthGuard } from '../guards/auth.guard';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Showcase, ShowcasePhoto])],
