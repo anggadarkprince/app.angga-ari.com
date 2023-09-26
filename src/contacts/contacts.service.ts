@@ -112,7 +112,7 @@ export class ContactsService {
 
   async findOne(id: number) {
     const contact = await this.repo.findOne({
-      where: { id: +id },
+      where: { id: id },
     });
     if (!contact) {
       throw new NotFoundException('Contact not found');

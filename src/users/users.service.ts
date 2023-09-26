@@ -57,7 +57,7 @@ export class UsersService {
    * @param id
    */
   findOne(id: number) {
-    return this.repo.findOne(id);
+    return this.repo.findOneBy({ id });
   }
 
   /**
@@ -66,7 +66,7 @@ export class UsersService {
    * @param email
    */
   findByEmail(email: string) {
-    return this.repo.findOne({ email: email });
+    return this.repo.findOneBy({ email: email });
   }
 
   /**
@@ -75,7 +75,7 @@ export class UsersService {
    * @param username
    */
   findByUsername(username: string) {
-    return this.repo.findOne({ username: username });
+    return this.repo.findOneBy({ username: username });
   }
 
   /**

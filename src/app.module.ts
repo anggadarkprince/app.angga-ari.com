@@ -1,15 +1,10 @@
-import {
-  BadRequestException,
-  MiddlewareConsumer,
-  Module,
-  ValidationPipe,
-} from '@nestjs/common';
+import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HealthController } from './health/health.controller';
 import { TerminusModule } from '@nestjs/terminus';
 import { HttpModule } from '@nestjs/axios';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import appConfig from './config/app.config';
 import authConfig from './config/auth.config';
@@ -19,7 +14,7 @@ import emailConfig from './config/email.config';
 import storageConfig from './config/storage.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
-import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 import { ShowcasesModule } from './showcases/showcases.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -41,10 +36,12 @@ const environment = process.env.NODE_ENV || 'production';
   imports: [
     HttpModule,
     TerminusModule,
-    ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 10,
-    }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 1000,
+        limit: 10,
+      },
+    ]),
     ConfigModule.forRoot({
       envFilePath: `.env${
         environment != 'production' ? `.${environment}` : ''
@@ -114,6 +111,10 @@ const environment = process.env.NODE_ENV || 'production';
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })

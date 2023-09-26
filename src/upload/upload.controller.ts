@@ -16,8 +16,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from './upload.service';
 import { UploadDto } from './dto/upload.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
+import { TransformInterceptor } from '../common/interceptors/transformer.interceptor';
 
 @UseGuards(AuthGuard)
+@UseInterceptors(TransformInterceptor)
 @Controller()
 export class UploadController {
   constructor(private uploadService: UploadService) {}
