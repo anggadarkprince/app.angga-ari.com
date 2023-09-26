@@ -36,6 +36,9 @@ export class Experience {
   @Column({ type: 'date', nullable: true })
   to: string;
 
+  @Column({ length: 300, nullable: true })
+  url: string;
+
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;
 

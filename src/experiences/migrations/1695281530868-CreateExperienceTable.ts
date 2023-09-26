@@ -30,6 +30,7 @@ export class CreateExperienceTable1695281530868 implements MigrationInterface {
           { name: 'title', type: 'varchar', length: '100' },
           { name: 'subtitle', type: 'varchar', length: '300' },
           { name: 'description', type: 'text', isNullable: true },
+          { name: 'url', type: 'varchar', length: '300', isNullable: true },
           { name: 'from', type: 'date' },
           { name: 'to', type: 'date', isNullable: true },
           { name: 'created_at', type: 'timestamp', default: 'now()' },
