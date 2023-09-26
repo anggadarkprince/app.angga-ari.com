@@ -2,7 +2,7 @@ import {
   CallHandler,
   ExecutionContext,
   Injectable,
-  NestInterceptor,
+  NestInterceptor, StreamableFile,
 } from '@nestjs/common';
 import { map } from 'rxjs';
 import { instanceToPlain } from 'class-transformer';
@@ -23,18 +23,21 @@ export class TransformInterceptor<T> implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler) {
     return next.handle().pipe(
       map((data) => {
+        if (data instanceof StreamableFile) {
+          return data;
+        }
         const statusCode = context.switchToHttp().getResponse().statusCode;
         const response: ApiResponseType<T> = {
           code: statusCode,
           status: getStatusLabel(statusCode),
         };
 
-        if (data.data) {
+        if (data?.data) {
           response.data = instanceToPlain(data.data);
         } else {
           response.data = instanceToPlain(data);
         }
-        if (data.meta) {
+        if (data?.meta) {
           response.meta = data.meta;
         }
 
