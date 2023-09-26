@@ -2,13 +2,14 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
+  Get, Header,
   HttpCode,
   HttpStatus,
   Param,
   Patch,
   Post,
   Query,
+  Res, StreamableFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -19,6 +20,7 @@ import { TransformInterceptor } from '../common/interceptors/transformer.interce
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { AllowGuest } from '../auth/decorators/allow-guest.decorator';
 import { ReplyMessageDto } from './dto/reply-message.dto';
+import { createReadStream } from 'fs';
 
 @UseGuards(AuthGuard)
 @UseInterceptors(TransformInterceptor)
@@ -35,6 +37,15 @@ export class ContactsController {
   @Get()
   findAll(@Query() filters: FilterMessage) {
     return this.contactService.findAll(filters);
+  }
+
+  @Get('export')
+  @Header('Content-Type', 'text/csv')
+  @Header('Content-Disposition', 'attachment; filename="contacts.csv"')
+  async exportToCsv(@Query() filters: FilterMessage) {
+    const path = await this.contactService.exportToCsv(filters);
+    const file = createReadStream(path);
+    return new StreamableFile(file);
   }
 
   @Get(':id')

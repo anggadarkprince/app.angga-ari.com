@@ -1,5 +1,6 @@
 import {
-  BadRequestException, ConflictException,
+  BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -17,6 +18,9 @@ import {
   STATUS_REJECTED,
   STATUS_REPLIED,
 } from './constants/status';
+import * as fs from 'fs';
+import { stringify } from 'csv-stringify';
+import { join } from 'path';
 
 @Injectable()
 export class ContactsService {
@@ -34,10 +38,13 @@ export class ContactsService {
   async findAll(filters: FilterMessage) {
     const queryBuilder = this.repo.createQueryBuilder('contacts');
 
-    queryBuilder
-      .orderBy(filters.order_by || 'id', filters.order_method)
-      .skip(filters.skip || (filters.page - 1) * filters.limit)
-      .take(filters.limit);
+    queryBuilder.orderBy(filters.order_by || 'id', filters.order_method);
+
+    if (filters.page) {
+      queryBuilder
+        .skip(filters?.skip || (filters.page - 1) * filters.limit)
+        .take(filters.limit);
+    }
 
     if (filters.search) {
       queryBuilder.andWhere(
@@ -59,6 +66,10 @@ export class ContactsService {
       });
     }
 
+    if (!filters.page) {
+      return await queryBuilder.getMany();
+    }
+
     const itemCount = await queryBuilder.getCount();
     const { entities } = await queryBuilder.getRawAndEntities();
 
@@ -70,6 +81,35 @@ export class ContactsService {
 
     return new PageDto(entities, pageMetaDto);
   }
+
+  async exportToCsv(filters: FilterMessage) {
+    filters.page = null;
+    const contacts = await this.findAll(filters);
+    const path = join('uploads', 'temp', 'contacts.csv');
+    if (contacts instanceof Array) {
+      const writableStream = fs.createWriteStream(path);
+      const stringifier = stringify({
+        delimiter: ',',
+        header: true,
+        columns: [
+          { key: 'name', header: 'Name' },
+          { key: 'email', header: 'Email' },
+          { key: 'project', header: 'Project' },
+          { key: 'message', header: 'Message' },
+          { key: 'status', header: 'Status' },
+          { key: 'created_at', header: 'Created At' },
+        ],
+      });
+      contacts.forEach((item) => {
+        stringifier.write(item);
+      });
+      stringifier.pipe(writableStream);
+
+      return path;
+    }
+    return null;
+  }
+
   async findOne(id: number) {
     const contact = await this.repo.findOne({
       where: { id: +id },

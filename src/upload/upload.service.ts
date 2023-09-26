@@ -1,10 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as path from 'path';
 import * as fs from 'fs';
 import { ConfigService } from '@nestjs/config';
 import { UploadResultDto } from './dto/upload-result.dto';
 import * as S3 from 'aws-sdk/clients/s3';
-import { Readable } from 'stream';
 
 export type StorageType = 'local' | 's3';
 
@@ -14,11 +13,19 @@ interface UploadOptions {
   acl?: string;
 }
 
+interface S3ConfigType {
+  endpoint: string;
+  accessKey: string;
+  secretKey: string;
+  region?: string;
+  bucket: string;
+}
+
 @Injectable()
 export class UploadService {
-  public readonly basePath;
-  private readonly s3;
-  private defaultDriver;
+  public readonly basePath: string;
+  private readonly s3: S3ConfigType;
+  private defaultDriver: string;
 
   constructor(private configService: ConfigService) {
     this.basePath = this.configService.get('storage.dest');
@@ -66,8 +73,10 @@ export class UploadService {
       const uploadPathFile = `${options.path || ''}/${fileName}`;
       const s3 = new S3({
         endpoint: this.s3.endpoint,
-        accessKeyId: this.s3.accessKey,
-        secretAccessKey: this.s3.secretKey,
+        credentials: {
+          accessKeyId: this.s3.accessKey,
+          secretAccessKey: this.s3.secretKey,
+        },
       });
       const params = {
         Bucket: this.s3.bucket,
@@ -126,8 +135,10 @@ export class UploadService {
   getStream(key: string) {
     const s3 = new S3({
       endpoint: this.s3.endpoint,
-      accessKeyId: this.s3.accessKey,
-      secretAccessKey: this.s3.secretKey,
+      credentials: {
+        accessKeyId: this.s3.accessKey,
+        secretAccessKey: this.s3.secretKey,
+      },
     });
     const getObject = s3.getObject({
       Bucket: this.s3.bucket,

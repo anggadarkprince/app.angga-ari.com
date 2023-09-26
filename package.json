@@ -40,6 +40,7 @@
     "compression": "^1.7.4",
     "cookie-session": "^2.0.0",
     "cross-env": "^7.0.3",
+    "csv": "^6.3.3",
     "handlebars": "^4.7.7",
     "helmet": "^5.0.2",
     "mime-types": "^2.1.35",

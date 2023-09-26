@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-const crypto = require('crypto');
+import * as crypto from 'crypto';
 
 @Injectable()
 export class UtilityService {
@@ -7,8 +7,8 @@ export class UtilityService {
   key = crypto.randomBytes(32);
   iv = crypto.randomBytes(16);
 
-  encrypt(text) {
-    let cipher = crypto.createCipheriv(
+  encrypt(text: string) {
+    const cipher = crypto.createCipheriv(
       this.algorithm,
       Buffer.from(this.key),
       this.iv,
@@ -21,10 +21,10 @@ export class UtilityService {
     };
   }
 
-  decrypt(text) {
-    let iv = Buffer.from(text.iv, 'hex');
-    let encryptedText = Buffer.from(text.encryptedData, 'hex');
-    let decipher = crypto.createDecipheriv(
+  decrypt(text: { iv: string; encryptedData: string }) {
+    const iv = Buffer.from(text.iv, 'hex');
+    const encryptedText = Buffer.from(text.encryptedData, 'hex');
+    const decipher = crypto.createDecipheriv(
       this.algorithm,
       Buffer.from(this.key),
       iv,
