@@ -28,8 +28,9 @@ import { ContactsModule } from './contacts/contacts.module';
 import { HttpExceptionFilter } from './common/exceptions/http-exception.filter';
 import { validationExceptionFactory } from './common/exceptions/validation-exception';
 import { AllExceptionsFilter } from './common/exceptions/all-exceptions.filter';
+import { ProfileModule } from './profile/profile.module';
+import * as cookieSession from 'cookie-session';
 
-const cookieSession = require('cookie-session');
 const environment = process.env.NODE_ENV || 'production';
 
 @Module({
@@ -93,6 +94,7 @@ const environment = process.env.NODE_ENV || 'production';
     ExpertisesModule,
     ExperiencesModule,
     ContactsModule,
+    ProfileModule,
   ],
   controllers: [AppController, HealthController],
   providers: [
