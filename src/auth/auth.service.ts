@@ -26,7 +26,6 @@ import {
   ON_USER_FORGOT_PASSWORD,
   UserForgotPasswordEvent,
 } from './events/user-forgot-password.event';
-import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtService } from '@nestjs/jwt';
 
 const scrypt = promisify(_scrypt);
@@ -146,15 +145,9 @@ export class AuthService {
     return user;
   }
 
-  /**
-   * Reset password user.
-   *
-   * @param password
-   * @param token
-   */
-  async resetPassword(password: string, token: string) {
+  verifyResetToken(token: string) {
     const tokenPayload = this.extractTokenPayload(token);
-    const { email, type, expiredAt } = tokenPayload;
+    const { type, expiredAt } = tokenPayload;
 
     const isInvalidType = type !== TOKEN_RESET_PASSWORD;
     const isExpired = new Date() > new Date(expiredAt);
@@ -162,6 +155,19 @@ export class AuthService {
     if (isExpired || isInvalidType) {
       throw new BadRequestException('Token is expired or invalid request type');
     }
+
+    return tokenPayload;
+  }
+
+  /**
+   * Reset password user.
+   *
+   * @param password
+   * @param token
+   */
+  async resetPassword(password: string, token: string) {
+    const tokenPayload = this.verifyResetToken(token);
+    const { email } = tokenPayload;
 
     const user = await this.userService.findByEmail(email);
     if (!user) {

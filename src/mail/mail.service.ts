@@ -25,7 +25,7 @@ export class MailService {
     return this.mailerService.sendMail({
       to: user.email,
       subject: 'Welcome to App! Confirm your Email',
-      template: 'user-confirmation',
+      template: './user-confirmation',
       context: {
         name: user.name,
         email: user.email,
@@ -42,14 +42,13 @@ export class MailService {
    * @param token
    */
   sendResetPasswordLink(user: User, token: string) {
-    const url = `${this.configService.get(
-      'app.url',
-    )}/auth/forgot-password?token=${token}`;
+    const frontendUrl = this.configService.get('app.frontendUrl');
+    const url = `${frontendUrl}/reset-password?token=${token}`;
 
     return this.mailerService.sendMail({
       to: user.email,
       subject: 'Forgot password link',
-      template: 'forgot-password',
+      template: './forgot-password',
       context: {
         name: user.name,
         email: user.email,
@@ -63,7 +62,7 @@ export class MailService {
     return this.mailerService.sendMail({
       to: contact.email,
       subject: title,
-      template: 'reply-message',
+      template: './reply-message',
       context: {
         name: contact.name,
         email: contact.email,

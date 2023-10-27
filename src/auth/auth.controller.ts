@@ -50,6 +50,11 @@ export class AuthController {
     return await this.authService.forgotPassword(email);
   }
 
+  @Post('auth/verify-reset-token')
+  async verifyResetToken(@Body('token') token: string) {
+    return this.authService.verifyResetToken(token);
+  }
+
   @Patch('auth/reset-password')
   async resetPassword(
     @Body() body: ResetPasswordDto,
