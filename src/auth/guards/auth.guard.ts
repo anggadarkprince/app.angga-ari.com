@@ -32,7 +32,8 @@ export class AuthGuard implements CanActivate {
     // check session only
     // return request.session.userId;
 
-    const token = this.extractTokenFromHeader(request);
+    const cookieToken = request.cookies?.access_token;
+    const token = cookieToken || this.extractTokenFromHeader(request);
     if (!token) {
       throw new UnauthorizedException('Access token is not found');
     }

@@ -35,7 +35,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       code: code,
     };
 
-    console.info(originalResponse);
     if (!apiResponse.status) {
       apiResponse.status = getStatusLabel(apiResponse.code);
     }

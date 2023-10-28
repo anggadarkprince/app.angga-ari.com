@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  Res,
   Session,
   UseGuards,
   UseInterceptors,
@@ -20,18 +21,30 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { TokenQueryDto } from './dto/token-query.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { TransformInterceptor } from '../common/interceptors/transformer.interceptor';
+import { ConfigService } from '@nestjs/config';
 
 @UseInterceptors(TransformInterceptor)
 @Controller()
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private configService: ConfigService,
+  ) {}
 
   @Post('auth')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() body: CredentialDto, @Session() session: any) {
+  async login(
+    @Body() body: CredentialDto,
+    @Session() session: any,
+    @Res({ passthrough: true }) response,
+  ) {
     const data = await this.authService.login(body.username, body.password);
     session.userId = data.data.id;
-
+    response.cookie('access_token', data.meta.access_token, {
+      domain: this.configService.get('cookie.domain'),
+      httpOnly: true,
+      path: '/',
+    });
     return data;
   }
 
@@ -65,8 +78,13 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(204)
-  logout(@Session() session: any) {
+  logout(@Session() session: any, @Res({ passthrough: true }) response) {
     session.userId = null;
+    response.clearCookie('access_token', {
+      domain: this.configService.get('cookie.domain'),
+      httpOnly: true,
+      path: '/',
+    });
   }
 
   @Get('me')

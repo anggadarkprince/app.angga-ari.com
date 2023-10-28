@@ -18,9 +18,8 @@ export class MailService {
    * @param token
    */
   sendUserConfirmation(user: User, token: string) {
-    const url = `${this.configService.get(
-      'app.url',
-    )}/auth/confirm?token=${token}`;
+    const frontendUrl = this.configService.get('app.frontendUrl');
+    const url = `${frontendUrl}/confirm?token=${token}`;
 
     return this.mailerService.sendMail({
       to: user.email,
