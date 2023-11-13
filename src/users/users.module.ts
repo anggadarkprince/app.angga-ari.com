@@ -7,6 +7,7 @@ import { EmailAvailableRule } from './rules/email-available.rule';
 import { UsernameAvailableRule } from './rules/username-available.rule';
 import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { AuthService } from '../auth/auth.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
@@ -19,6 +20,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       provide: APP_INTERCEPTOR,
       useClass: CurrentUserInterceptor,
     },
+    AuthService,
   ],
   exports: [UsersService],
 })

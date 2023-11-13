@@ -59,10 +59,7 @@ export class AuthService {
       throw new BadRequestException('Status user is inactive');
     }
 
-    const [salt, storedHash] = user.password.split('.');
-    const hash = (await scrypt(password, salt, 32)) as Buffer;
-
-    if (storedHash === hash.toString('hex')) {
+    if (await this.checkPassword(user.password, password)) {
       const payload = {
         sub: user.id,
         username: user.username,
@@ -74,6 +71,12 @@ export class AuthService {
       return { data: user, meta: tokens };
     }
     throw new UnauthorizedException('Password is wrong');
+  }
+
+  async checkPassword(hashedPassword: string, plainPassword: string) {
+    const [salt, storedHash] = hashedPassword.split('.');
+    const hash = (await scrypt(plainPassword, salt, 32)) as Buffer;
+    return storedHash === hash.toString('hex');
   }
 
   /**
