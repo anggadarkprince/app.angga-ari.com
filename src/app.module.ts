@@ -29,6 +29,7 @@ import { HttpExceptionFilter } from './common/exceptions/http-exception.filter';
 import { validationExceptionFactory } from './common/exceptions/validation-exception';
 import { AllExceptionsFilter } from './common/exceptions/all-exceptions.filter';
 import { ProfileModule } from './profile/profile.module';
+import { SettingsModule } from './settings/settings.module';
 import * as cookieSession from 'cookie-session';
 
 const environment = process.env.NODE_ENV || 'production';
@@ -95,6 +96,7 @@ const environment = process.env.NODE_ENV || 'production';
     ExperiencesModule,
     ContactsModule,
     ProfileModule,
+    SettingsModule,
   ],
   controllers: [AppController, HealthController],
   providers: [

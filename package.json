@@ -21,7 +21,7 @@
     "test:e2e": "cross-env NODE_ENV=test jest --config ./test/jest-e2e.json",
     "typeorm": "ts-node ./node_modules/typeorm/cli",
     "typeorm:run-migration": "npm run typeorm migration:run -- -d ./datasource.config.ts",
-    "typeorm:create-migration": "npm run typeorm migration:create -- -d ./datasource.config.ts"
+    "typeorm:create-migration": "npm run typeorm migration:create"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.9.1",
