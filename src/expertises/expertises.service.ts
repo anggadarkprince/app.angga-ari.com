@@ -28,7 +28,9 @@ export class ExpertisesService {
     const expertise = this.repo.create(createExpertiseDto);
     expertise.user_id = user.id;
 
-    return this.repo.save(expertise);
+    await this.repo.save(expertise);
+
+    return this.findOne(expertise.id);
   }
 
   findAll(filter: FilterExpertise) {
@@ -41,7 +43,7 @@ export class ExpertisesService {
       }
       return this.repo.find({
         where: where,
-        relations: ['skills'],
+        relations: ['expertises'],
       });
     }
     return this.repo.find({
@@ -56,7 +58,7 @@ export class ExpertisesService {
   async findOne(id: number) {
     const expertise = await this.repo.findOne({
       where: { id: +id },
-      relations: ['skills'],
+      relations: ['expertises'],
     });
     if (!expertise) {
       throw new NotFoundException('Expertise not found');
@@ -68,7 +70,6 @@ export class ExpertisesService {
   async update(id: number, updateExpertiseDto: UpdateExpertiseDto) {
     const expertise = await this.findOne(id);
     Object.assign(expertise, updateExpertiseDto);
-    console.log(updateExpertiseDto)
 
     return this.repo.save(expertise);
   }

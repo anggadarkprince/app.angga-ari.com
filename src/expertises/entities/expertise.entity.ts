@@ -19,7 +19,7 @@ export class Expertise {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => Expertise, (expertise) => expertise.skills)
+  @ManyToOne(() => Expertise, (expertise) => expertise.expertises)
   @JoinColumn({ name: 'section_id' })
   section: Expertise;
 
@@ -48,5 +48,5 @@ export class Expertise {
   updated_at: Date;
 
   @OneToMany(() => Expertise, (expertise) => expertise.section)
-  skills: Expertise[];
+  expertises: Expertise[];
 }
