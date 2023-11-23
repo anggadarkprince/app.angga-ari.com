@@ -35,6 +35,9 @@ export class Expertise {
   @Column({ length: 300 })
   subtitle: string;
 
+  @Column({ length: 100 })
+  icon: string;
+
   @Column({ type: 'int', width: 5 })
   level: number;
 

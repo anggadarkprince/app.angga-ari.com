@@ -26,4 +26,9 @@ export class CreateExpertiseDto {
   @Min(1)
   @IsOptional()
   level: number;
+
+  @IsString()
+  @MaxLength(50)
+  @IsOptional()
+  icon: string;
 }

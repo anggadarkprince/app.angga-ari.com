@@ -24,6 +24,7 @@ export class ExpertisesService {
         throw new BadRequestException('Expertise should reference a section');
       }
     }
+
     const expertise = this.repo.create(createExpertiseDto);
     expertise.user_id = user.id;
 
@@ -67,6 +68,7 @@ export class ExpertisesService {
   async update(id: number, updateExpertiseDto: UpdateExpertiseDto) {
     const expertise = await this.findOne(id);
     Object.assign(expertise, updateExpertiseDto);
+    console.log(updateExpertiseDto)
 
     return this.repo.save(expertise);
   }
