@@ -15,6 +15,7 @@ export class ExperiencesService {
   create(createExperienceDto: CreateExperienceDto, user: User) {
     const experience = this.repo.create(createExperienceDto);
     experience.user_id = user.id;
+    experience.to = createExperienceDto.to || null;
 
     return this.repo.save(experience);
   }
@@ -36,6 +37,7 @@ export class ExperiencesService {
 
   async update(id: number, updateExperienceDto: UpdateExperienceDto) {
     const experience = await this.findOne(id);
+    updateExperienceDto.to = updateExperienceDto.to || null;
     Object.assign(experience, updateExperienceDto);
 
     return this.repo.save(experience);

@@ -1,4 +1,10 @@
-import { IsOptional, IsString, IsUrl, MaxLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateExperienceDto {
   @IsString()
@@ -14,17 +20,17 @@ export class CreateExperienceDto {
   subtitle: string;
 
   @IsString()
-  @MaxLength(10)
+  @MaxLength(30)
   from: string;
 
   @IsString()
   @IsOptional()
-  @MaxLength(10)
+  @MaxLength(30)
   to?: string;
 
   @IsString()
-  @IsOptional()
   @IsUrl()
+  @IsOptional()
   @MaxLength(300)
   url?: string;
 }
